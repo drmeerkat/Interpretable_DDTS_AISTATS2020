@@ -130,3 +130,6 @@ dmypy.json
 
 */*/tree.png
 
+# model ckpt and run logs
+txts/
+models/

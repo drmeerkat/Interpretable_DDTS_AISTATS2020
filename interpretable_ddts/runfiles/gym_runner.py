@@ -1,15 +1,18 @@
 # Created by Andrew Silva on 8/28/19
+# Modified by Mingxuan Li on 3/24/21
+import os
 import gym
-import numpy as np
-import torch
-from interpretable_ddts.agents.ddt_agent import DDTAgent
-from interpretable_ddts.agents.mlp_agent import MLPAgent
-from interpretable_ddts.opt_helpers.replay_buffer import discount_reward
-import torch.multiprocessing as mp
 import argparse
 import copy
 import random
+import numpy as np
+import torch
+import torch.multiprocessing as mp
+from tqdm import tqdm
 
+from interpretable_ddts.agents.ddt_agent import DDTAgent
+from interpretable_ddts.agents.mlp_agent import MLPAgent
+from interpretable_ddts.opt_helpers.replay_buffer import discount_reward
 
 def run_episode(q, agent_in, ENV_NAME, seed=0):
     agent = agent_in.duplicate()
@@ -56,7 +59,9 @@ def run_episode(q, agent_in, ENV_NAME, seed=0):
 
 def main(episodes, agent, ENV_NAME):
     running_reward_array = []
-    for episode in range(episodes):
+    if not os.path.exists('../models/'):
+        os.mkdir('../models/')
+    for episode in tqdm(range(episodes)):
         reward = 0
         returned_object = run_episode(None, agent_in=agent, ENV_NAME=ENV_NAME)
         reward += returned_object[0]
@@ -104,9 +109,9 @@ if __name__ == "__main__":
     # mp.set_start_method('spawn')
     mp.set_sharing_strategy('file_system')
     for i in range(5):
-        bot_name = AGENT_TYPE + ENV_TYPE
+        bot_name = AGENT_TYPE + '_' + ENV_TYPE
         if USE_GPU:
-            bot_name += 'GPU'
+            bot_name += '_GPU_'
         if AGENT_TYPE == 'ddt':
             policy_agent = DDTAgent(bot_name=bot_name,
                                     input_dim=dim_in,

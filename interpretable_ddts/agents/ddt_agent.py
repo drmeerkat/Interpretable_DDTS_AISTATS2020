@@ -141,23 +141,25 @@ class DDTAgent:
     def end_episode(self, reward):
         value_loss, action_loss = self.ppo.batch_updates(self.replay_buffer, self)
         self.num_steps += 1
-        bot_name = '../txts/' + self.bot_name
-        with open(bot_name + '_rewards.txt', 'a') as myfile:
+        bot_path = '../txts/' 
+        if not os.path.exists(bot_path):
+            os.mkdir(bot_path)
+        with open(bot_path + self.bot_name + '_rewards.txt', 'a') as myfile:
             myfile.write(str(reward) + '\n')
 
     def reset(self):
         self.replay_buffer.clear()
 
     def save(self, fn='last'):
-        act_fn = fn + self.bot_name + '_actor_' + '.pth.tar'
-        val_fn = fn + self.bot_name + '_critic_' + '.pth.tar'
+        act_fn = fn + '_' + self.bot_name + '_actor' + '.pth.tar'
+        val_fn = fn + '_' + self.bot_name + '_critic' + '.pth.tar'
 
         save_ddt(act_fn, self.action_network)
         save_ddt(val_fn, self.value_network)
 
     def load(self, fn='last'):
-        act_fn = fn + self.bot_name + '_actor_' + '.pth.tar'
-        val_fn = fn + self.bot_name + '_critic_' + '.pth.tar'
+        act_fn = fn + '_' + self.bot_name + '_actor' + '.pth.tar'
+        val_fn = fn + '_' + self.bot_name + '_critic' + '.pth.tar'
 
         if os.path.exists(act_fn):
             self.action_network = load_ddt(act_fn)
